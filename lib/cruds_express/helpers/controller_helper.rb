@@ -50,21 +50,28 @@ module CrudExpress::Helpers
         end
       end
 
-      def cruds_express_model(model:, cruds:, action:, controller: @default_controller, method: nil, source: nil)
-        name = model_name(model)
-        cruds_express[name] ||= HashWithIndifferentAccess.new
-        cruds_express[name][:action] ||= HashWithIndifferentAccess.new
-        cruds_express[name][:action][action] ||= HashWithIndifferentAccess.new
-        cruds_express[name][:action][action][:cruds] = cruds
-        cruds_express[name][:action][action][:source] = source
-        cruds_express[name][:cruds] ||= HashWithIndifferentAccess.new
-        cruds_express[name][:cruds][cruds] ||= HashWithIndifferentAccess.new
-        cruds_express[name][:cruds][cruds][:controller] = controller
-        cruds_express[name][:cruds][cruds][:action] = action
-        cruds_express[name][:cruds][cruds][:method] = method || default_method(action: action)
+      def cruds_express_model(model, cruds:, action: nil, controller: @default_controller, method: nil, source: nil)
+        if cruds.is_a?(Array)
+          cruds.each do |f|
+            cruds_express_model(model, cruds: f, action: action, controller: controller, method: method, source: source)
+          end
+        else
+          name = model_name(model)
+          action = default_action(cruds: cruds) if action.blank?
+          cruds_express[name] ||= HashWithIndifferentAccess.new
+          cruds_express[name][:action] ||= HashWithIndifferentAccess.new
+          cruds_express[name][:action][action] ||= HashWithIndifferentAccess.new
+          cruds_express[name][:action][action][:cruds] = cruds
+          cruds_express[name][:action][action][:source] = source
+          cruds_express[name][:cruds] ||= HashWithIndifferentAccess.new
+          cruds_express[name][:cruds][cruds] ||= HashWithIndifferentAccess.new
+          cruds_express[name][:cruds][cruds][:controller] = controller
+          cruds_express[name][:cruds][cruds][:action] = action
+          cruds_express[name][:cruds][cruds][:method] = method || default_method(action: action)
+        end
       end
 
-      def cruds_express_column(model:, permit: [], hide: [])
+      def cruds_express_column(model, permit: [], hide: [])
         name = model_name(model)
         cruds_express[name] ||= HashWithIndifferentAccess.new
         cruds_express[name][:permit] = permit
@@ -86,6 +93,9 @@ module CrudExpress::Helpers
     end
 
     module InstanceMethods
+      def cruds_show
+        
+      end
 
       def cruds_read
         result = self.send(cruds_express[http_curd_express_model][:action][params[:action]][:source])
