@@ -1,22 +1,26 @@
-- cruds_express.each do |k, v|
-  -# = render partial: 'shared/cruds_express/template_single', locals: {table}
-  = k
-  = v
-
 %ul.nav.nav-tabs
-  %li.active
-    %a{"data-toggle" => "tab", :href => "#home"} Home
-  %li
-    %a{"data-toggle" => "tab", :href => "#menu1"} Menu 1
-  %li
-    %a{"data-toggle" => "tab", :href => "#menu2"} Menu 2
+  - cruds_express.each_with_index do |(k, v), i|
+    %li{:class => i == 0 ? :active : nil}
+      %a{"data-toggle" => "tab", :href => "##{k}"}
+        = k
 .tab-content
-  #home.tab-pane.fade.in.active
-    %h3 HOME
-    %p Some content.
-  #menu1.tab-pane.fade
-    %h3 Menu 1
-    %p Some content in menu 1.
-  #menu2.tab-pane.fade
-    %h3 Menu 2
-    %p Some content in menu 2.
+  - cruds_express.each_with_index do |(k, v), i|
+    .tab-pane.fade{:id => k, :class => i == 0 ? [:active, :in] : nil}
+      %h3 HOME
+      %p Some content.
+-#   %li.active
+-#     %a{"data-toggle" => "tab", :href => "#home"} Home
+-#   %li
+-#     %a{"data-toggle" => "tab", :href => "#menu1"} Menu 1
+-#   %li
+-#     %a{"data-toggle" => "tab", :href => "#menu2"} Menu 2
+-# .tab-content
+-#   #home.tab-pane.fade.in.active
+-#     %h3 HOME
+-#     %p Some content.
+-#   #menu1.tab-pane.fade
+-#     %h3 Menu 1
+-#     %p Some content in menu 1.
+-#   #menu2.tab-pane.fade
+-#     %h3 Menu 2
+-#     %p Some content in menu 2.

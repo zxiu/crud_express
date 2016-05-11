@@ -24,8 +24,17 @@ module CrudExpress::Helpers
         cruds_express[name][:hide].include?(column_name.to_sym)
       end
 
-      def cruds_express_controller(controller:)
-        @default_controller = controller
+      def cruds_express_controller(model, controller:)
+        name = model_name(model)
+        default_controllers[name] = controller
+      end
+
+      def default_controller(model)
+        default_controllers[model_name(model)]
+      end
+
+      def default_controllers
+        @default_controllers ||= HashWithIndifferentAccess.new
       end
 
       def default_method(action:)
@@ -50,13 +59,14 @@ module CrudExpress::Helpers
         end
       end
 
-      def cruds_express_model(model, cruds:, action: nil, controller: @default_controller, method: nil, source: nil)
+      def cruds_express_model(model, cruds:, action: nil, controller: nil, method: nil, source: nil)
         if cruds.is_a?(Array)
           cruds.each do |f|
             cruds_express_model(model, cruds: f, action: action, controller: controller, method: method, source: source)
           end
         else
           name = model_name(model)
+          controller = default_controller(model) if controller.blank?
           action = default_action(cruds: cruds) if action.blank?
           cruds_express[name] ||= HashWithIndifferentAccess.new
           cruds_express[name][:action] ||= HashWithIndifferentAccess.new
@@ -94,7 +104,7 @@ module CrudExpress::Helpers
 
     module InstanceMethods
       def cruds_show
-        
+
       end
 
       def cruds_read
