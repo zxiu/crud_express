@@ -1,0 +1,8 @@
+- table_name = entry_list.table.name
+
+:javascript
+  var table_name = "#{table_name}"
+  var tables = tables || {}
+  tables[table_name] = #{entry_list.to_json}
+  //var cruds_ajaxs = cruds_ajaxs || {}
+  //cruds_ajaxs[table_name] = #{entry_list.cruds_ajax.to_json}
