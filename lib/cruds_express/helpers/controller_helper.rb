@@ -105,7 +105,7 @@ module CrudExpress::Helpers
       end
 
 
-      def cruds_express_model(model, cruds: cruds_all, action: nil, controller: nil, method: nil, source: nil, permit: [], hide: [])
+      def cruds_express_model(model, cruds: cruds_all, action: nil, controller: nil, method: nil, source: nil, permit: [], hide: nil)
         model_name = model.name
         cruds_express[model_name] ||= hash_new
         cruds_express[model_name][:columns] ||= hash_new
@@ -113,11 +113,11 @@ module CrudExpress::Helpers
           column_name = column.name.to_sym
           cruds_express[model_name][:columns][column_name] ||= hash_new
           cruds_express[model_name][:columns][column_name][:permit] = permit.include?(column_name)
-          cruds_express[model_name][:columns][column_name][:hide] = hide.include?(column_name)
+          cruds_express[model_name][:columns][column_name][:hide] = hide.include?(column_name) unless hide.blank?
         end
 
         cruds_express[model_name][:cruds] ||= hash_new
-        cruds_express[model_name][:action] ||= hash_new
+        cruds_express[model_name][:actions] ||= hash_new
         parse_cruds(cruds).each do |func|
           ctr = default_controller(model, controller: controller)
           act = action || default_action(cruds: func)
@@ -133,9 +133,9 @@ module CrudExpress::Helpers
           end
           cruds_express[model_name][:cruds][func][:method] = method || default_method(action: act)
 
-          cruds_express[model_name][:action][act] ||= hash_new
-          cruds_express[model_name][:action][act][:crud] = func
-          cruds_express[model_name][:action][act][:source] = source
+          cruds_express[model_name][:actions][act] ||= hash_new
+          cruds_express[model_name][:actions][act][:crud] = func
+          cruds_express[model_name][:actions][act][:source] = source
         end
       end
 
@@ -161,6 +161,8 @@ module CrudExpress::Helpers
     end
 
     module InstanceMethods
+      attr_accessor :locals
+
       def cruds_show
 
       end
@@ -191,24 +193,19 @@ module CrudExpress::Helpers
         render json: {success: success, message: message}
       end
 
-      def http_cruds_express_model
-        request.env["HTTP_CRUDS_EXPRESS_MODEL"]
-      end
-
-      def cruds_express_prepare
-        if request.xhr?
-          puts("check_allowed=#{check_allowed?}")
-          if check_allowed?
-            self.send ("cruds_#{cruds_express[http_curd_express_model][:action][params[:action]][:crud]}")
-          else
-            render_result(false, :forbidden!)
+      def prepare_cruds_express
+        action = params[:action]
+        cruds_express.each do |model_name, value|
+          unless value[:actions][action].blank?
+            value[:entries] = self.send(value[:actions][action][:source])
           end
         end
-        @cruds_express = cruds_express
+        locals[:cruds_express] = cruds_express
+        # render action: :index
       end
 
-      def check_allowed?
-        cruds_express[http_curd_express_model][:action].has_key?(params[:action])
+      def locals
+        @locals ||= Hash.new
       end
 
       def cruds_express

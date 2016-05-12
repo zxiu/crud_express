@@ -1,8 +1,15 @@
-%li.list-group-item.list-group-item-info
-  = entry.inspect
-  -# %span.deadline= user.first_name
-  %span.edit
-    -# = link_to edit_task_path(task), remote: true do
-    -#   %button.btn.btn-primary.btn-xs Edit
-    -# = link_to task, remote: true, method: :delete, data: { confirm: 'Are you sure?' } do
-    -#   %button.btn.btn-danger.btn-xs Delete!
+-# %li.list-group-item.list-group-item-info
+-#   = entry.inspect
+-#   -# %span.deadline= user.first_name
+-#   %span.edit
+-#     -# = link_to edit_task_path(task), remote: true do
+-#     -#   %button.btn.btn-primary.btn-xs Edit
+-#     -# = link_to task, remote: true, method: :delete, data: { confirm: 'Are you sure?' } do
+-#     -#   %button.btn.btn-danger.btn-xs Delete!
+
+%tr
+  - columns.each do |column_name, prop|
+    - unless prop[:hide]
+      %td
+        = entry[column_name]
+  %td

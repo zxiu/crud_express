@@ -1,0 +1,32 @@
+= model
+-# %table.table
+  %thead
+    %tr
+      - model[:columns].each do |column_name, prop|
+        - hide = prop[:hide]
+        - unless hide
+          %td
+            = column_name
+      %td
+        .pull-right
+          - show = value[:cruds].has_key?(:create)
+          -# - crud = Hash.new
+          -# - crud[:create] = Hash.new
+          -# - crud[:create][:url] = url_for entry_list.url_for_params(:create, id: 0)
+          -# - crud[:create][:method] = :post
+          - if show
+            %button.btn.btn-danger.btn-sm{"data-target" => "#modal-#{model}", "data-toggle" => "modal", :type => "button",
+                    :data => {:action => :create, :todo => :new, :model => model, :cruds => value[:cruds]}}
+              = "+"
+
+-# index
+-#
+-# %ul.nav.nav-tabs
+-#   -# - cruds_express.each_with_index do |(model, v), i|
+-#     %li{:class => i == 0 ? :active : nil}
+-#       %a{"data-toggle" => "tab", :href => "#tab-#{model}"}
+-#         = model
+-#
+-# .row
+-#   #tasks.col-md-7.col-md-offset-1
+-#     = render collection: @entries, partial: 'shared/cruds_express/entry'

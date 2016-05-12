@@ -1,11 +1,35 @@
-index
-
 %ul.nav.nav-tabs
-  -# - cruds_express.each_with_index do |(model, v), i|
+  - cruds_express.each_with_index do |(model, v), i|
     %li{:class => i == 0 ? :active : nil}
       %a{"data-toggle" => "tab", :href => "#tab-#{model}"}
         = model
+.tab-content
+  - cruds_express.each_with_index do |(model, value), i|
+    .tab-pane.fade{:id => "tab-#{model}", :class => i == 0 ? [:active, :in] : nil}
+      %table.table
+        %thead
+          %tr
+            - value[:columns].each do |column_name, prop|
+              - unless prop[:hide]
+                %td
+                  = column_name
+            %td
+              .pull-right
+                - if value[:cruds].has_key?(:create)
+                  = link_to controller: value[:cruds][:create][:controller], action: :new, remote: true do
+                    %button.btn.btn-danger.btn-sm
+                      = "+"
 
-.row
-  #tasks.col-md-7.col-md-offset-1
-    = render collection: @entries, partial: 'shared/cruds_express/entry'
+                  -# = link_to controller: value[:cruds][:create][:controller], action: value[:cruds][:create][:action], remote: true do
+                  -#   %button.btn.btn-danger.btn-sm{"data-target" => "#modal-#{model}", "data-toggle" => "modal", :type => "button",
+                  -#           :data => {:action => :create, :todo => :new, :model => model, :cruds => value[:cruds]}}
+                  -#     = "+"
+          %tbody
+            -# - controller.send(value[:source]).each do |entry|
+            - value[:entries].each do |entry|
+              = render partial: 'shared/cruds_express/entry', object: entry, locals: {columns: value[:columns]}
+              -# %tr
+              -#   - value[:columns].each do |column_name, prop|
+              -#     - unless prop[:hide]
+              -#       %td
+              -#         = entry[column_name]
