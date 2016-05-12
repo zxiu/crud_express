@@ -9,3 +9,6 @@
 (1..10).each do |i|
   User.create(first_name: 'Z', last_name: 'Xiu', gender: 'male', email: 'zxiu@zxiu.com', birthday: Date.today)
 end
+(1..10).each do |i|
+  Article.create(title: 'haha', content: 'What a gem')
+end
