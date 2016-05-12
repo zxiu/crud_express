@@ -1,0 +1,11 @@
+index
+
+%ul.nav.nav-tabs
+  -# - cruds_express.each_with_index do |(model, v), i|
+    %li{:class => i == 0 ? :active : nil}
+      %a{"data-toggle" => "tab", :href => "#tab-#{model}"}
+        = model
+
+.row
+  #tasks.col-md-7.col-md-offset-1
+    = render collection: @entries, partial: 'shared/cruds_express/entry'

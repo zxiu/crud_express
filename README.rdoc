@@ -1,3 +1,6 @@
 = CrudExpress
 
 This project rocks and uses MIT-LICENSE.
+
+Thanks for the tutorial
+https://github.com/gotealeaf/rai-jax
