@@ -126,17 +126,22 @@ module CrudExpress::Helpers
           cruds_express[model_name][:cruds][func][:controller] = ctr
           cruds_express[model_name][:cruds][func][:action] = act
           cruds_express[model_name][:cruds][func][:url] =
-          begin
-            Rails.application.routes.url_helpers.url_for(controller: ctr, action: act, only_path: true)
-          rescue
-            Rails.application.routes.url_helpers.url_for(controller: ctr, action: act, id: ":id", only_path: true)
-          end
+            begin
+              Rails.application.routes.url_helpers.url_for(controller: ctr, action: act, only_path: true)
+            rescue
+              Rails.application.routes.url_helpers.url_for(controller: ctr, action: act, id: ":id", only_path: true)
+            end
           cruds_express[model_name][:cruds][func][:method] = method || default_method(action: act)
 
           cruds_express[model_name][:actions][act] ||= hash_new
           cruds_express[model_name][:actions][act][:crud] = func
           cruds_express[model_name][:actions][act][:source] = source
+
+
         end
+
+
+
       end
 
       def cruds_express_column(model, permit: [], hide: [])
@@ -201,7 +206,28 @@ module CrudExpress::Helpers
           end
         end
         locals[:cruds_express] = cruds_express
-        # render action: :index
+        respond_to do |format|
+          format.html {render action: action}
+          format.js {render partial:'shared/cruds_express/dispatcher', locals: locals}
+        end
+      end
+
+      def index
+      end
+
+      def new
+      end
+
+      def edit
+      end
+
+      def delete
+      end
+
+      def update
+      end
+
+      def show
       end
 
       def locals
