@@ -1,0 +1,3 @@
+console.log("model index")
+console.log("#model-container[controller='<%= params[:controller] %>]'")
+$("#model-container[controller='<%= params[:controller] %>']").html("<%= j (render partial: 'shared/cruds_express/model/index.html', locals: @locals) %>")

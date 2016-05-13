@@ -2,7 +2,7 @@ module CrudExpress::Helpers
   module ControllerHelper
     extend ActiveSupport::Concern
 
-    module ClassMethods
+    module ClassMethodsBackup
       def cruds_expresslize(roller)
         self.include InstanceMethods
         case roller
@@ -180,24 +180,66 @@ module CrudExpress::Helpers
 
     module AdminClassMethods
       def add_model(model, controller:)
-        models[model.name] = controller
+        models[model.name] = Hash.new
+        models[model.name][:controller] = controller
       end
 
       def models
-        @models ||= HashWithIndifferentAccess.new
+        locals[:models] = @models ||= HashWithIndifferentAccess.new
       end
     end
 
     module AdminInstanceMethods
+      attr_accessor :models
 
+      def models
+        self.class.models
+      end
     end
 
     module ModelClassMethods
-
+      attr_accessor :entries_func
+      def cruds_express_entries(func)
+        @entries_func = func
+      end
     end
 
     module ModelInstanceMethods
+      def entries
+        self.send(self.class.entries_func) unless self.class.entries_func.blank?
+      end
 
+
+    end
+
+    module ClassMethods
+      attr_accessor :locals, :roller
+      def cruds_express_roller(roller)
+        @roller = roller
+        self.include InstanceMethods
+        case roller
+        when :admin
+          as_cruds_admin
+        when :model
+          as_cruds_model
+        end
+      end
+
+
+
+      def as_cruds_admin
+        self.extend AdminClassMethods
+        self.include AdminInstanceMethods
+      end
+
+      def as_cruds_model
+        self.extend ModelClassMethods
+        self.include ModelInstanceMethods
+      end
+
+      def locals
+        @locals ||= HashWithIndifferentAccess.new
+      end
     end
 
     module InstanceMethods
@@ -234,27 +276,40 @@ module CrudExpress::Helpers
       end
 
       def prepare_cruds_express
-        action = params[:action]
-        cruds_express.each do |model_name, value|
-          unless value[:actions][action].blank?
-            value[:entries] = self.send(value[:actions][action][:source])
-          end
-        end
-        locals[:cruds_express] = cruds_express
-        respond_to do |format|
-          format.html {render action: action}
-          format.js {render partial:'shared/cruds_express/dispatcher', locals: locals}
-        end
+
+        # cruds_express.each do |model_name, value|
+        #   unless value[:actions][action].blank?
+        #     value[:entries] = self.send(value[:actions][action][:source])
+        #   end
+        # end
+        # locals[:cruds_express] = cruds_express
+        @locals = locals
+        @locals[:entries] = entries if self.class.roller == :model
       end
 
       def index
+        action = params[:action]
+        respond_to do |format|
+          format.html {}
+          format.js {render partial: "shared/cruds_express/#{self.class.roller}/#{action}", locals: @locals}
+        end
+      end
+
+      def edit
+        @entry = User.find_by(id: params[:id])
+        puts(@entry)
+        action = params[:action]
+        respond_to do |format|
+          format.html {}
+          format.js {render partial: "shared/cruds_express/#{self.class.roller}/#{action}", object: @entry}
+        end
+
       end
 
       def new
       end
 
-      def edit
-      end
+
 
       def delete
       end
@@ -265,8 +320,11 @@ module CrudExpress::Helpers
       def show
       end
 
+      def create
+      end
+
       def locals
-        @locals ||= Hash.new
+        self.class.locals
       end
 
       def cruds_express

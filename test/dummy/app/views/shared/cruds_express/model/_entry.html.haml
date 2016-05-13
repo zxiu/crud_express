@@ -8,11 +8,11 @@
 -#     -#   %button.btn.btn-danger.btn-xs Delete!
 
 %tr
-  - columns.each do |column_name, prop|
-    - unless prop[:hide]
-      %td
-        = entry[column_name]
+  - entry.class.column_names.each do |column_name|
+    %td
+      = entry.send(column_name)
   %td
     .pull-right
-      = button_to :Edit, {controller: cruds[:create][:controller], action: :edit, id: entry[:id]},
-          method: :get, remote: true, class: "btn btn-primary btn-sm"
+      = button_to :Edit, {controller: params[:controller], action: :edit, id: entry[:id]},
+                          method: :get, remote: true, class: "btn btn-primary btn-sm",
+                          data: {target: "#modal", toggle: "modal"}
