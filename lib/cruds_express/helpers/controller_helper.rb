@@ -3,8 +3,24 @@ module CrudExpress::Helpers
     extend ActiveSupport::Concern
 
     module ClassMethods
-      def cruds_expresslize
+      def cruds_expresslize(roller)
         self.include InstanceMethods
+        case roller
+        when :admin
+          as_cruds_admin
+        when :model
+          as_cruds_model
+        end
+      end
+
+      def as_cruds_admin
+        self.extend AdminClassMethods
+        self.include AdminInstanceMethods
+      end
+
+      def as_cruds_model
+        self.extend ModelClassMethods
+        self.include ModelInstanceMethods
       end
 
       def allow?(model_or_class, action:)
@@ -139,9 +155,6 @@ module CrudExpress::Helpers
 
 
         end
-
-
-
       end
 
       def cruds_express_column(model, permit: [], hide: [])
@@ -163,6 +176,28 @@ module CrudExpress::Helpers
           return (model_or_class.is_a?(Class) ? model_or_class : model_or_class.class).model_name.to_s.to_sym
         end
       end
+    end
+
+    module AdminClassMethods
+      def add_model(model, controller:)
+        models[model.name] = controller
+      end
+
+      def models
+        @models ||= HashWithIndifferentAccess.new
+      end
+    end
+
+    module AdminInstanceMethods
+
+    end
+
+    module ModelClassMethods
+
+    end
+
+    module ModelInstanceMethods
+
     end
 
     module InstanceMethods
