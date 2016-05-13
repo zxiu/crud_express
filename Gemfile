@@ -19,5 +19,5 @@ gem "jquery-rails"
 gem 'jquery-ui-rails'
 gem 'therubyracer'
 gem "twitter-bootstrap-rails"
-gem 'responders', '~> 2.0'
+# gem 'responders', '~> 2.0'
 gem 'simple_form'

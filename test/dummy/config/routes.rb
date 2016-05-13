@@ -2,7 +2,7 @@ Rails.application.routes.draw do
 
 
 
-  resources :admin, only: [:index]
+  resources :admin
   resources :system, only: [:index]
   # resource :admin, only: [:show]
 

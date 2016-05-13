@@ -16,10 +16,8 @@
             %td
               .pull-right
                 - if value[:cruds].has_key?(:create)
-                  = link_to controller: value[:cruds][:create][:controller], action: :new, remote: true do
-                    %button.btn.btn-danger.btn-sm
-                      = "+"
-
+                  = button_to "+", {controller: value[:cruds][:create][:controller], action: :new},
+                      method: :get, remote: true, class: "btn btn-danger btn-sm" 
                   -# = link_to controller: value[:cruds][:create][:controller], action: value[:cruds][:create][:action], remote: true do
                   -#   %button.btn.btn-danger.btn-sm{"data-target" => "#modal-#{model}", "data-toggle" => "modal", :type => "button",
                   -#           :data => {:action => :create, :todo => :new, :model => model, :cruds => value[:cruds]}}
@@ -27,9 +25,11 @@
           %tbody
             -# - controller.send(value[:source]).each do |entry|
             - value[:entries].each do |entry|
-              = render partial: 'shared/cruds_express/entry', object: entry, locals: {columns: value[:columns]}
+              = render partial: 'shared/cruds_express/entry', object: entry, locals: {columns: value[:columns], cruds: value[:cruds]}
               -# %tr
               -#   - value[:columns].each do |column_name, prop|
               -#     - unless prop[:hide]
               -#       %td
               -#         = entry[column_name]
+
+#modal-container

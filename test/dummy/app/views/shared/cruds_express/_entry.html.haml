@@ -13,3 +13,6 @@
       %td
         = entry[column_name]
   %td
+    .pull-right
+      = button_to :Edit, {controller: cruds[:create][:controller], action: :edit, id: entry[:id]},
+          method: :get, remote: true, class: "btn btn-primary btn-sm"
