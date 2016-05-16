@@ -330,13 +330,21 @@ module CrudExpress::Helpers
         locals[:entry] = @entry
       end
 
+      def destroy
+        @entry = self.class.model.find_by(id: params[:id])
+        @entry.destroy
+        render action: :index
+      end
+
       def respond_curds_express
         @entry = self.class.model.find_by(id: params[:id])
         action = params[:action]
         self.send(action)
+        unless performed?
         respond_to do |format|
           format.html {}
           format.js {render partial: "shared/cruds_express/#{self.class.roller}/#{action}", locals: locals}
+        end
         end
       end
 
