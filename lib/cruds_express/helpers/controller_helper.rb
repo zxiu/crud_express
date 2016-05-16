@@ -213,15 +213,15 @@ module CrudExpress::Helpers
     end
 
     module ClassMethods
-      attr_accessor :locals, :roller
-      def cruds_express_roller(roller)
+      attr_accessor :locals, :roller, :model
+      def cruds_express_roller(roller, model = nil)
         @roller = roller
         self.include InstanceMethods
         case roller
         when :admin
           as_cruds_admin
         when :model
-          as_cruds_model
+          as_cruds_model(model)
         end
       end
 
@@ -232,9 +232,10 @@ module CrudExpress::Helpers
         self.include AdminInstanceMethods
       end
 
-      def as_cruds_model
+      def as_cruds_model(model)
         self.extend ModelClassMethods
         self.include ModelInstanceMethods
+        @model = model
       end
 
       def locals
@@ -288,40 +289,65 @@ module CrudExpress::Helpers
       end
 
       def index
-        action = params[:action]
-        respond_to do |format|
-          format.html {}
-          format.js {render partial: "shared/cruds_express/#{self.class.roller}/#{action}", locals: @locals}
-        end
-      end
-
-      def edit
-        @entry = User.find_by(id: params[:id])
-        puts(@entry)
-        action = params[:action]
-        respond_to do |format|
-          format.html {}
-          format.js {render partial: "shared/cruds_express/#{self.class.roller}/#{action}", object: @entry}
-        end
-
+        locals[:entries] = entries if self.class.roller == :model
+        locals[:cruds_express] = cruds_express if self.class.roller == :index
       end
 
       def new
+        @entry = self.class.model.find_or_initialize_by(id: params[:id])
+        locals[:entry] = @entry
       end
 
+      def permit_params
+        params.require(ActiveModel::Naming.param_key(self.class.model))
+                                .permit(:first_name, :last_name, :email, :title, :gender, :birthday)
 
+      end
+
+      def create
+        @entry = self.class.model.new
+        permit_params.each do |k, v|
+          value = @entry.defined_enums.has_key?(k) ? v.to_i : v
+          @entry[k] = value
+        end
+        @entry.save
+        locals[:entry] = @entry
+      end
+
+      def edit
+        locals[:entry] = User.find_by(id: params[:id])
+      end
+
+      def update
+        puts("permit_params=#{permit_params}")
+        @entry = self.class.model.find_by(id: params[:id])
+        permit_params.each do |k, v|
+          value = @entry.defined_enums.has_key?(k) ? v.to_i : v
+          @entry[k] = value
+        end
+        @entry.save
+        # @entry.update_attributes(permit_params)
+        locals[:entry] = @entry
+      end
+
+      def respond_curds_express
+        @entry = self.class.model.find_by(id: params[:id])
+        action = params[:action]
+        self.send(action)
+        respond_to do |format|
+          format.html {}
+          format.js {render partial: "shared/cruds_express/#{self.class.roller}/#{action}", locals: locals}
+        end
+      end
 
       def delete
       end
 
-      def update
-      end
+
 
       def show
       end
 
-      def create
-      end
 
       def locals
         self.class.locals

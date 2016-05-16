@@ -4,9 +4,14 @@
       - entries.column_names.each do |column_name|
         %td
           = column_name
+      %td
+        .pull-right
+          = button_to "+", {controller: params[:controller], action: :new},
+                              method: :get, remote: true, class: "btn btn-warning btn-sm"
   %tbody
     - entries.each do |entry|
-      = render partial: 'shared/cruds_express/model/entry', object: entry
+      %tr{class: entry.model_name, id: "#{entry.model_name}_#{entry[:id]}"}
+        = render partial: 'shared/cruds_express/model/entry', object: entry
       -# - entries.columns.each do |column|
       -#   = column.inspect
         -# - unless prop[:hide]

@@ -5,25 +5,6 @@ module CrudExpress::Models
     module ClassMethods
     end
 
-    def url_for_params(function, id: nil)
-      params = {:controller => cruds_ajax[function][:controller], :action => cruds_ajax[function][:action]}
-      case function.to_sym
-      when :index, :create, :new
-      when :edit, :show, :update, :destroy, :delete
-        params[:id] = id
-      end
-      return params
-    end
-
-    def add_cruds_ajax(function, controller:, action:, method:)
-      cruds_ajax[function] = {controller: controller, action: action, method: method}
-      return self
-    end
-
-    def cruds_ajax
-      @cruds_ajax ||= ActiveSupport::HashWithIndifferentAccess.new
-    end
-
     def show_columns(*column_names)
       column_names.map{|column_name| hidden_columns.delete(column_name.to_sym)}
       return self
@@ -36,12 +17,12 @@ module CrudExpress::Models
     end
 
     def edit_columns(*column_names)
-      column_names.map{|column_name| disabled_columns.delete(column_name.to_sym)}
+      column_names.map{|column_name| readonly_columns.delete(column_name.to_sym)}
       return self
     end
 
-    def disable_columns(*column_names)
-      column_names.map{|column_name| disabled_columns.add(column_name.to_sym)}
+    def readonly_columns(*column_names)
+      column_names.map{|column_name| readonly_columns.add(column_name.to_sym)}
       return self
     end
 
@@ -54,11 +35,11 @@ module CrudExpress::Models
     end
 
     def editable?(column_name)
-      !disabled?(column_name)
+      !readonly?(column_name)
     end
 
-    def disabled?(column_name)
-      disabled_columns.include?(column_name.to_sym)
+    def readonly?(column_name)
+      readonly_columns.include?(column_name.to_sym)
     end
 
     def cruds_type(column_name)
@@ -78,12 +59,13 @@ module CrudExpress::Models
       end
     end
 
+    private
     def hidden_columns
       @hidden_columns ||= Set.new
     end
 
-    def disabled_columns
-      @disabled_columns ||= Set.new [:id, :created_at, :updated_at]
+    def readonly_columns
+      @readonly_columns ||= Set.new [:id, :created_at, :updated_at]
     end
 
     def column_types

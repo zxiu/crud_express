@@ -1,0 +1,4 @@
+
+console.log("<%= j (render partial: 'shared/cruds_express/model/entry', object: entry) %>")
+$('#modal').modal('hide');
+$("tr#<%= entry.model_name %>_<%= entry.id %>").html("<%= j (render partial: 'shared/cruds_express/model/entry', object: entry) %>")

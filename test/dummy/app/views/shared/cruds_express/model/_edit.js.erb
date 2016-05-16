@@ -1,3 +1,4 @@
 console.log('edit')
 console.log("<%= @entry.inspect.to_json %>")
-$('.modal-body').html("<%= j (render partial: 'shared/cruds_express/model/form.html', object: @entry) %>");
+$('.modal-body').html("<%= j (render partial: 'shared/cruds_express/model/edit.html', object: @entry) %>");
+$('#modal').modal('show'); 

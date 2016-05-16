@@ -1,18 +1,8 @@
--# %li.list-group-item.list-group-item-info
--#   = entry.inspect
--#   -# %span.deadline= user.first_name
--#   %span.edit
--#     -# = link_to edit_task_path(task), remote: true do
--#     -#   %button.btn.btn-primary.btn-xs Edit
--#     -# = link_to task, remote: true, method: :delete, data: { confirm: 'Are you sure?' } do
--#     -#   %button.btn.btn-danger.btn-xs Delete!
 
-%tr
-  - entry.class.column_names.each do |column_name|
-    %td
-      = entry.send(column_name)
+- entry.class.column_names.each do |column_name|
   %td
-    .pull-right
-      = button_to :Edit, {controller: params[:controller], action: :edit, id: entry[:id]},
-                          method: :get, remote: true, class: "btn btn-primary btn-sm",
-                          data: {target: "#modal", toggle: "modal"}
+    = entry.send(column_name)
+%td
+  .pull-right
+    = button_to :Edit, {controller: params[:controller], action: :edit, id: entry[:id]},
+                        method: :get, remote: true, class: "btn btn-primary btn-sm"

@@ -1,9 +1,0 @@
--# = simple_form_for @entry, remote: true do |f|
--#   = f.input  :description, as: :text
--#   = f.input  :deadline,    as: :datetimepicker
--#   = f.button :submit
-
-= simple_form_for @entry, url: url_for(controller: params[:controller], action: :update), remote: true do |f|
-  -# - @entry.class.column_names do |column_name|
-  = f.input :id, as: :string
-  = f.button :submit
