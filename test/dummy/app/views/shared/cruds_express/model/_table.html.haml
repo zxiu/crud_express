@@ -12,10 +12,9 @@
           .btn.btn-sm.btn-success
             %span.glyphicon.glyphicon-refresh
 
-  %tbody
+  %tbody{class: entries.model_name}
     - entries.each do |entry|
-      %tr{class: entry.model_name, id: "#{entry.model_name}_#{entry[:id]}"}
-        = render partial: 'shared/cruds_express/model/entry', object: entry
+      = render partial: 'shared/cruds_express/model/entry', object: entry
 
 :css
   td {

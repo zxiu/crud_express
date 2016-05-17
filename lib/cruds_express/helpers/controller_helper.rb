@@ -300,7 +300,7 @@ module CrudExpress::Helpers
 
       def permit_params
         params.require(ActiveModel::Naming.param_key(self.class.model))
-                                .permit(:first_name, :last_name, :email, :title, :gender, :birthday)
+                                .permit(:first_name, :last_name, :email, :title, :gender, :birthday, :content)
 
       end
 
@@ -333,7 +333,8 @@ module CrudExpress::Helpers
       def destroy
         @entry = self.class.model.find_by(id: params[:id])
         @entry.destroy
-        render action: :index
+        locals[:entry] = @entry
+        # render action: :index
       end
 
       def respond_curds_express
