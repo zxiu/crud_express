@@ -5,10 +5,27 @@
         %td
           = column_name
       %td
-        .pull-right
-          = button_to "+", {controller: params[:controller], action: :new},
-                              method: :get, remote: true, class: "btn btn-warning btn-sm"
+        = link_to controller: params[:controller], action: :new, method: :get, remote: true do
+          .btn.btn-sm.btn-warning
+            %span.glyphicon.glyphicon-plus
+        = link_to controller: params[:controller], action: :index, method: :get, remote: true do
+          .btn.btn-sm.btn-success
+            %span.glyphicon.glyphicon-refresh
+
   %tbody
     - entries.each do |entry|
       %tr{class: entry.model_name, id: "#{entry.model_name}_#{entry[:id]}"}
         = render partial: 'shared/cruds_express/model/entry', object: entry
+
+:css
+  td {
+    max-width:50px!;
+  }
+
+  .btn.btn-hover{
+    opacity: 0.1;
+  }
+
+  .btn.btn-hover:hover{
+    opacity: 0.8;
+  }

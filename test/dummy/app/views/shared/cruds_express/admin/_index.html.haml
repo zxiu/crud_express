@@ -7,10 +7,9 @@
 .tab-content
   - models.each_with_index do |(model_name, value), i|
     .tab-pane.fade{:id => "tab-#{model_name}"}
-      %p
-        .pull-right
-          = button_to "refresh", {controller: value[:controller], action: :index},
-                  method: :get, remote: true, class: ["btn", "btn-success", "btn-refresh"]
+      .hide
+        = button_to "refresh", {controller: value[:controller], action: :index},
+                  method: :get, remote: true, class: ["btn", "btn-success", "btn-refresh", "hide"]
       #table-container{controller: value[:controller]}
 
 .modal.fade{:id => "modal", "aria-labelledby" => "model-title", :role => "dialog", :tabindex => "-1"}
@@ -26,7 +25,7 @@
   $(function() {
     $('a[data-toggle="tab"]').on('show.bs.tab', function (e) {
       var tabId = $(e.target).attr('href');
-      $(tabId).find(".btn-refresh").click();
+      $(tabId).find(".btn-refresh").first().click();
     }).each(function(i){
       if (i == 0){
         $(this).tab('show')
