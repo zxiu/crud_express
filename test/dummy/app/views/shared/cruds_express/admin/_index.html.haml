@@ -1,4 +1,3 @@
-= models
 %ul.nav.nav-tabs
   - models.each_with_index do |(model_name, v), i|
     %li
@@ -12,7 +11,7 @@
         .pull-right
           = button_to "refresh", {controller: value[:controller], action: :index},
                   method: :get, remote: true, class: ["btn", "btn-success", "btn-refresh"]
-      #model-container{controller: value[:controller]}
+      #table-container{controller: value[:controller]}
 
 .modal.fade{:id => "modal", "aria-labelledby" => "model-title", :role => "dialog", :tabindex => "-1"}
   .modal-dialog{:role => "document"}

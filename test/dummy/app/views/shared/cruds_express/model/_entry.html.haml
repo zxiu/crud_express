@@ -3,8 +3,9 @@
   %td
     = entry.send(column_name)
 %td
-  = button_to :Del, {controller: params[:controller], action: :destroy, id: entry[:id]},
-                      method: :delete, remote: true, class: "btn btn-danger btn-sm",
-                      data: {confirm: "Really delete?"}
-  = button_to :Edit, {controller: params[:controller], action: :edit, id: entry[:id]},
+  %p
+    = button_to :Del, {controller: params[:controller], action: :destroy, id: entry[:id]},
+                        method: :delete, remote: true, class: "btn btn-danger btn-sm",
+                        data: {confirm: "Really delete?"}
+    = button_to :Edit, {controller: params[:controller], action: :edit, id: entry[:id]},
                       method: :get, remote: true, class: "btn btn-primary btn-sm"
