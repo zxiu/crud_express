@@ -4,7 +4,7 @@ class Admin::ArticlesController < ModelController
   before_action :prepare_cruds_express
   around_action :respond_curds_express
   def article_list
-    Article.all
+    Article.includes(:tags).all
   end
 
 end

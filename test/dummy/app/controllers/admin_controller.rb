@@ -6,6 +6,6 @@ class AdminController < ApplicationController
 
   add_model User, controller: 'admin/users'
   add_model Article, controller: 'admin/articles'
-
+  add_model Tag, controller: 'admin/tags'
 
 end

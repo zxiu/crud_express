@@ -18,6 +18,8 @@
             include_blank: false
       - elsif !@entry.class.readonly_attributes.include?(column_name)
         = f.input column_name, as: as
+  - @entry.class.reflect_on_all_associations.each do |association|
+    = association.class.name
   = f.button :submit, class: "btn btn-danger"
   = f.button :button, "Cancel", :type => :reset, :class => "btn btn-default", "data-dismiss" => "modal"
 :javascript
