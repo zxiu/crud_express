@@ -1,11 +1,13 @@
 %tr{class: entry.model_name, id: "#{entry.model_name}_#{entry[:id]}"}
   - entry.class.column_names.each do |column_name|
-    %td
-      = entry.send(column_name)
+    - unless @helper.hidden?(column_name)
+      %td
+        = entry.send(column_name)
+
   %td
     = link_to url_for(controller: params[:controller], action: :destroy, id: entry[:id]), method: :delete, remote: true,
         :data => {:confirm => "Really delete?"} do
-      .btn.btn-sm.btn-danger.btn-delete.btn-hover
+      .btn.btn-sm.btn-danger.btn-delete
         %span.icon.glyphicon.glyphicon-trash
     = link_to url_for(controller: params[:controller], action: :edit, id: entry[:id]), method: :get, remote: true do
       .btn.btn-sm.btn-primary.btn-edit

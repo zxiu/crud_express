@@ -2,21 +2,22 @@
 = simple_form_for @entry, wrapper: :vertical_input_group,
         wrapper_mappings: {check_boxes: :horizontal_radio_and_checkboxes, radio_buttons: :horizontal_radio_and_checkboxes, file: :horizontal_file_input, boolean: :horizontal_boolean}, url: url_for(controller: params[:controller], action: @entry.id.blank? ? :create : :update), remote: true do |f|
   - @entry.class.column_names.each do |column_name|
-    - as = case column_types[column_name]
-      - when :date
-        - :date_picker
-      - when :time
-        - :time_picker
-      - when :datetime
-        - :datetime_picker
-      - else column_types[column_name]
-    - if @entry.class.defined_enums.has_key?(column_name)
-      = f.input column_name,
-          collection: @entry.class.defined_enums[column_name],
-          selected: @entry.class.defined_enums[column_name][@entry.send(column_name)],
-          include_blank: false
-    - elsif !@entry.class.readonly_attributes.include?(column_name)
-      = f.input column_name, as: as
+    - unless @helper.hidden?(column_name) || @helper.readonly?(column_name)
+      - as = case column_types[column_name]
+        - when :date
+          - :date_picker
+        - when :time
+          - :time_picker
+        - when :datetime
+          - :datetime_picker
+        - else column_types[column_name]
+      - if @entry.class.defined_enums.has_key?(column_name)
+        = f.input column_name,
+            collection: @entry.class.defined_enums[column_name],
+            selected: @entry.class.defined_enums[column_name][@entry.send(column_name)],
+            include_blank: false
+      - elsif !@entry.class.readonly_attributes.include?(column_name)
+        = f.input column_name, as: as
   = f.button :submit, class: "btn btn-danger"
   = f.button :button, "Cancel", :type => :reset, :class => "btn btn-default", "data-dismiss" => "modal"
 :javascript

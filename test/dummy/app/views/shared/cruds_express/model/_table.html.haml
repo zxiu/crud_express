@@ -2,8 +2,9 @@
   %thead
     %tr
       - entries.column_names.each do |column_name|
-        %td
-          = column_name
+        - unless @helper.hidden?(column_name)
+          %td
+            = column_name
       %td
         = link_to controller: params[:controller], action: :new, method: :get, remote: true do
           .btn.btn-sm.btn-warning
@@ -21,10 +22,10 @@
     max-width:50px!;
   }
 
-  .btn.btn-hover{
+  .btn-delete{
     opacity: 0.1;
   }
 
-  .btn.btn-hover:hover{
+  .btn-delete:hover{
     opacity: 0.8;
   }
