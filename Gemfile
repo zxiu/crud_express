@@ -21,3 +21,5 @@ gem 'therubyracer'
 gem "twitter-bootstrap-rails"
 # gem 'responders', '~> 2.0'
 gem 'simple_form'
+gem 'datetimepicker-rails', github: 'zpaulovics/datetimepicker-rails', branch: 'master', submodules: true
+gem 'enum_help'

@@ -1,0 +1,31 @@
+%table.table
+  %thead
+    %tr
+      - collection.column_names.each do |column_name|
+        - unless @helper.hidden?(column_name)
+          %td
+            = column_name
+      %td
+        = link_to controller: params[:controller], action: :new, method: :get, remote: true do
+          .btn.btn-sm.btn-warning
+            %span.glyphicon.glyphicon-plus
+        = link_to controller: params[:controller], action: :index, method: :get, remote: true do
+          .btn.btn-sm.btn-success
+            %span.glyphicon.glyphicon-refresh
+
+  %tbody{class: collection.model_name}
+    - collection.each do |entry|
+      = render partial: 'shared/cruds_express/model/entry', object: entry
+
+:css
+  td {
+    max-width:50px!;
+  }
+
+  .btn-delete{
+    opacity: 0.1;
+  }
+
+  .btn-delete:hover{
+    opacity: 0.8;
+  }

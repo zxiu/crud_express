@@ -6,9 +6,18 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
+Tag.create(name: "apple")
+Tag.create(name: "google")
+Tag.create(name: "banana")
+
+tags = Tag.all.to_a
+
 (1..10).each do |i|
   User.create(first_name: 'Z', last_name: 'Xiu', gender: 'male', email: 'zxiu@zxiu.com', birthday: Date.today)
 end
 (1..10).each do |i|
-  Article.create(title: 'haha', content: 'What a gem')
+
+  article = Article.create(title: 'haha', content: 'What a gem')
+  article.tags = tags
+  article.save
 end

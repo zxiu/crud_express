@@ -1,10 +1,7 @@
 Rails.application.routes.draw do
 
-
-
-  resources :admin
+  resources :admin, only: [:index]
   resources :system, only: [:index]
-  # resource :admin, only: [:show]
 
   scope module: :system do
     resources :users, only: [:show]
