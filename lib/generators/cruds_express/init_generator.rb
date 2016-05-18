@@ -6,7 +6,7 @@ module Cruds_express
       def copy_view_templates
         puts("source_root=#{self.class.source_root}")
         create_file "app/views/shared/test.html", "<html></html>"
-        directory "views"
+        directory "views", "app/views"
       end
     end
   end
