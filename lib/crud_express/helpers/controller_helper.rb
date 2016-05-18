@@ -23,7 +23,7 @@ module CrudExpress::Helpers
     module ModelClassMethods
       attr_accessor :collection_func
 
-      def cruds_express_collection(func)
+      def crud_express_collection(func)
         @collection_func = func
       end
     end
@@ -36,7 +36,7 @@ module CrudExpress::Helpers
 
     module ClassMethods
       attr_accessor :locals, :roller, :model, :includes_models
-      def cruds_express_roller(roller = :model, model: nil, includes: {}, hide: [], lock: [:id, :created_at, :updated_at])
+      def crud_express_roller(roller = :model, model: nil, includes: {}, hide: [], lock: [:id, :created_at, :updated_at])
         @roller = roller
         self.include InstanceMethods
         case roller
@@ -127,7 +127,7 @@ module CrudExpress::Helpers
     module InstanceMethods
       attr_accessor :locals
 
-      def prepare_cruds_express
+      def prepare_crud_express
         @locals = locals
         @locals[:collection] = collection if self.class.roller == :model
         @model = self.class.model
@@ -137,7 +137,7 @@ module CrudExpress::Helpers
 
       def index
         locals[:collection] = collection if self.class.roller == :model
-        locals[:cruds_express] = cruds_express if self.class.roller == :index
+        locals[:crud_express] = crud_express if self.class.roller == :index
       end
 
       def new
@@ -150,7 +150,7 @@ module CrudExpress::Helpers
       end
 
       def create
-        @entry = self.class.model.new      
+        @entry = self.class.model.new
         @entry.update_attributes(permit_params)
         locals[:entry] = @entry
       end
@@ -171,14 +171,14 @@ module CrudExpress::Helpers
         locals[:entry] = @entry
       end
 
-      def respond_curds_express
+      def respond_crud_express
         @entry = self.class.model.find_by(id: params[:id])
         action = params[:action]
         self.send(action)
         unless performed?
         respond_to do |format|
           format.html {}
-          format.js {render partial: "shared/cruds_express/#{self.class.roller}/#{action}", locals: locals}
+          format.js {render partial: "shared/crud_express/#{self.class.roller}/#{action}", locals: locals}
         end
         end
       end
@@ -191,8 +191,8 @@ module CrudExpress::Helpers
         self.class.locals
       end
 
-      def cruds_express
-        self.class.cruds_express
+      def crud_express
+        self.class.crud_express
       end
 
     end

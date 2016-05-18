@@ -1,8 +1,8 @@
 class Admin::UsersController < ModelController
-  cruds_express_roller model: User, includes: {:articles => {:label => :title}}, hide: [:created_at], lock: [:id]
-  cruds_express_collection :user_list
-  before_action :prepare_cruds_express
-  around_action :respond_curds_express
+  crud_express_roller model: User, includes: {:articles => {:label => :title}}, hide: [:created_at], lock: [:id]
+  crud_express_collection :user_list
+  before_action :prepare_crud_express
+  around_action :respond_crud_express
 
   def user_list
     User.includes(:articles).all

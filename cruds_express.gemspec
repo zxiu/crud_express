@@ -1,15 +1,15 @@
 $:.push File.expand_path("../lib", __FILE__)
 
 # Maintain your gem's version:
-require "cruds_express/version"
+require "crud_express/version"
 
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |s|
-  s.name        = "cruds_express"
+  s.name        = "crud_express"
   s.version     = CrudExpress::VERSION
   s.authors     = ["zxiu"]
   s.email       = ["zxiu2015@gmail.com"]
-  s.homepage    = "https://github.com/zxiu/cruds_express"
+  s.homepage    = "https://github.com/zxiu/crud_express"
   s.summary     = "Summary of CrudExpress."
   s.description = "Description of CrudExpress."
   s.license     = "MIT"

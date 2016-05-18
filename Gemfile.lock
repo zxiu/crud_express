@@ -10,7 +10,7 @@ GIT
 PATH
   remote: .
   specs:
-    cruds_express (0.0.1)
+    crud_express (0.0.1)
       rails (~> 4.2.6)
 
 GEM
@@ -164,7 +164,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  cruds_express!
+  crud_express!
   datetimepicker-rails!
   enum_help
   haml-rails (~> 0.9)
