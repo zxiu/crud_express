@@ -1,7 +1,7 @@
 %table.table
   %thead
     %tr
-      - entries.column_names.each do |column_name|
+      - collection.column_names.each do |column_name|
         - unless @helper.hidden?(column_name)
           %td
             = column_name
@@ -13,8 +13,8 @@
           .btn.btn-sm.btn-success
             %span.glyphicon.glyphicon-refresh
 
-  %tbody{class: entries.model_name}
-    - entries.each do |entry|
+  %tbody{class: collection.model_name}
+    - collection.each do |entry|
       -# = entry.try("tags").inspect if entry[:id] == 1
       -# = entry.class.reflect_on_all_associations.map{|reflect| reflect.macro}  if entry[:id] == 1
       = @helper.includes_models.inspect if entry[:id] == 1

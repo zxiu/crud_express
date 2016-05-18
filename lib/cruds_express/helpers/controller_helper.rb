@@ -21,16 +21,16 @@ module CrudExpress::Helpers
     end
 
     module ModelClassMethods
-      attr_accessor :entries_func
+      attr_accessor :collection_func
 
-      def cruds_express_entries(func)
-        @entries_func = func
+      def cruds_express_collection(func)
+        @collection_func = func
       end
     end
 
     module ModelInstanceMethods
-      def entries
-        @entries = self.try(self.class.entries_func)
+      def collection
+        @collection = self.try(self.class.collection_func)
       end
     end
 
@@ -113,14 +113,14 @@ module CrudExpress::Helpers
 
       def prepare_cruds_express
         @locals = locals
-        @locals[:entries] = entries if self.class.roller == :model
+        @locals[:collection] = collection if self.class.roller == :model
         @model = self.class.model
         @helper = self.class
         @includes_models = self.class.includes_models
       end
 
       def index
-        locals[:entries] = entries if self.class.roller == :model
+        locals[:collection] = collection if self.class.roller == :model
         locals[:cruds_express] = cruds_express if self.class.roller == :index
       end
 
