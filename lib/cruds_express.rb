@@ -1,6 +1,12 @@
 module CrudExpress
-  extend ActiveSupport::Concern
 end
+
+begin
+  require 'rails'
+rescue LoadError
+end
+
+
 
 ActiveSupport.on_load(:active_record) do
   require 'cruds_express/helpers/controller_helper'
