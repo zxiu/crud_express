@@ -3,7 +3,7 @@ require File.expand_path('../boot', __FILE__)
 require 'rails/all'
 
 Bundler.require(*Rails.groups)
-require "cruds_express"
+require "crud_express"
 
 module Dummy
   class Application < Rails::Application

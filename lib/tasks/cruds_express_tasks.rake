@@ -1,8 +1,8 @@
 # desc "Explaining what the task does"
-# task :cruds_express do
+# task :crud_express do
 #   # Task goes here
 # end
-namespace :cruds_express do
+namespace :crud_express do
   desc "test"
   task :test => :environment do
     puts( "test 123")
