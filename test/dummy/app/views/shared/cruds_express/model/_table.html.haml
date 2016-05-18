@@ -15,9 +15,6 @@
 
   %tbody{class: collection.model_name}
     - collection.each do |entry|
-      -# = entry.try("tags").inspect if entry[:id] == 1
-      -# = entry.class.reflect_on_all_associations.map{|reflect| reflect.macro}  if entry[:id] == 1
-      = @helper.includes_models.inspect if entry[:id] == 1
       = render partial: 'shared/cruds_express/model/entry', object: entry
 
 :css

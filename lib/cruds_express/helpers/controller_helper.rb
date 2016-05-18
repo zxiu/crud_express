@@ -36,7 +36,7 @@ module CrudExpress::Helpers
 
     module ClassMethods
       attr_accessor :locals, :roller, :model, :includes_models
-      def cruds_express_roller(roller = :model, model: nil, includes: [], hide: [], lock: [:id, :created_at, :updated_at])
+      def cruds_express_roller(roller = :model, model: nil, includes: {}, hide: [], lock: [:id, :created_at, :updated_at])
         @roller = roller
         self.include InstanceMethods
         case roller
@@ -49,8 +49,12 @@ module CrudExpress::Helpers
           @model = model
           hide_columns(*hide)
           lock_columns(*lock)
-          @includes_models = Set.new(includes)
+          @includes_models = includes_models.merge(includes)
         end
+      end
+
+      def includes_models
+        @includes_models ||= Hash.new
       end
 
       def locals
@@ -68,8 +72,20 @@ module CrudExpress::Helpers
         return self
       end
 
-      def permited_columns
-        (Set.new(@model.column_names) - hidden_columns).to_a
+      def permit_columns
+        includes_models_columns = Array.new
+        includes_models.each do |model_name, config|
+          association_foreign_key = model.reflect_on_association(model_name).association_foreign_key
+          case model.reflect_on_association(model_name).macro
+            when :has_many, :has_and_belongs_to_many
+              includes_models_columns.push("#{association_foreign_key}s" => [])
+            when :has_one, :belongs_to
+              includes_models_columns.push("#{association_foreign_key}")
+          end
+        end
+        s = (Set.new(@model.column_names) - hidden_columns).to_a.concat(includes_models_columns)
+        puts("permit_columns=#{s}")
+        return s
       end
 
       def visible?(column_name)
@@ -130,16 +146,12 @@ module CrudExpress::Helpers
       end
 
       def permit_params
-        params.require(ActiveModel::Naming.param_key(self.class.model)).permit(*self.class.permited_columns)
+        params.require(ActiveModel::Naming.param_key(self.class.model)).permit(*self.class.permit_columns)
       end
 
       def create
-        @entry = self.class.model.new
-        permit_params.each do |k, v|
-          value = @entry.defined_enums.has_key?(k) ? v.to_i : v
-          @entry[k] = value
-        end
-        @entry.save
+        @entry = self.class.model.new      
+        @entry.update_attributes(permit_params)
         locals[:entry] = @entry
       end
 
@@ -148,13 +160,8 @@ module CrudExpress::Helpers
       end
 
       def update
-        puts("permit_params=#{permit_params}")
         @entry = self.class.model.find_by(id: params[:id])
-        permit_params.each do |k, v|
-          value = @entry.defined_enums.has_key?(k) ? v.to_i : v
-          @entry[k] = value
-        end
-        @entry.save
+        @entry.update_attributes(permit_params)
         locals[:entry] = @entry
       end
 
