@@ -35,8 +35,8 @@ module CrudExpress::Helpers
     end
 
     module ClassMethods
-      attr_accessor :locals, :roller, :model
-      def cruds_express_roller(roller = :model, model: nil, hide: [], lock: [:id, :created_at, :updated_at])
+      attr_accessor :locals, :roller, :model, :includes_models
+      def cruds_express_roller(roller = :model, model: nil, includes: [], hide: [], lock: [:id, :created_at, :updated_at])
         @roller = roller
         self.include InstanceMethods
         case roller
@@ -49,6 +49,7 @@ module CrudExpress::Helpers
           @model = model
           hide_columns(*hide)
           lock_columns(*lock)
+          @includes_models = Set.new(includes)
         end
       end
 
@@ -104,6 +105,7 @@ module CrudExpress::Helpers
         @column_types ||= @model.columns.each_with_object(ActiveSupport::HashWithIndifferentAccess.new){|column, hsh| hsh[column.name] = column.type}
       end
 
+
     end
 
     module InstanceMethods
@@ -114,6 +116,7 @@ module CrudExpress::Helpers
         @locals[:entries] = entries if self.class.roller == :model
         @model = self.class.model
         @helper = self.class
+        @includes_models = self.class.includes_models
       end
 
       def index

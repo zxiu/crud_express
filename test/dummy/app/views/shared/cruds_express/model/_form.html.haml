@@ -1,6 +1,6 @@
 - column_types = @entry.class.columns.each_with_object(HashWithIndifferentAccess.new){|column, hsh| hsh[column.name] = column.type}
 = simple_form_for @entry, wrapper: :vertical_input_group,
-        wrapper_mappings: {check_boxes: :horizontal_radio_and_checkboxes, radio_buttons: :horizontal_radio_and_checkboxes, file: :horizontal_file_input, boolean: :horizontal_boolean}, url: url_for(controller: params[:controller], action: @entry.id.blank? ? :create : :update), remote: true do |f|
+        wrapper_mappings: {check_boxes: :test_radio_and_checkboxes, radio_buttons: :horizontal_radio_and_checkboxes, file: :horizontal_file_input, boolean: :horizontal_boolean}, url: url_for(controller: params[:controller], action: @entry.id.blank? ? :create : :update), remote: true do |f|
   - @entry.class.column_names.each do |column_name|
     - unless @helper.hidden?(column_name) || @helper.readonly?(column_name)
       - as = case column_types[column_name]
@@ -18,8 +18,13 @@
             include_blank: false
       - elsif !@entry.class.readonly_attributes.include?(column_name)
         = f.input column_name, as: as
-  - @entry.class.reflect_on_all_associations.each do |association|
-    = association.class.name
+  - @helper.includes_models.each do |association|
+    - as = case @entry.class.reflect_on_association(association).macro
+      - when :has_many, :has_and_belongs_to_many
+        - :check_boxes
+      - when :belongs_to, :has_one
+        - :radio_buttons
+    = f.association association, as: as
   = f.button :submit, class: "btn btn-danger"
   = f.button :button, "Cancel", :type => :reset, :class => "btn btn-default", "data-dismiss" => "modal"
 :javascript
