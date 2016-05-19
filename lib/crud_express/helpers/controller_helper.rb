@@ -1,6 +1,14 @@
 module CrudExpress::Helpers
   module ControllerHelper
     extend ActiveSupport::Concern
+
+    included do
+      # before_action :set_object, only: [:show]
+      puts(" included #{self}")
+      before_action :prepare_crud_express
+      # around_action :respond_crud_express
+    end
+
     module AdminClassMethods
       def add_model(model, controller:)
         models[model.name] = Hash.new
@@ -9,6 +17,10 @@ module CrudExpress::Helpers
 
       def models
         locals[:models] = @models ||= HashWithIndifferentAccess.new
+      end
+
+      def controllers
+        @controllers ||= []
       end
     end
 
@@ -35,11 +47,32 @@ module CrudExpress::Helpers
     end
 
     module ClassMethods
-      attr_accessor :locals, :roller, :model, :includes_models
-      def crud_express_roller(roller = :model, model: nil, includes: {}, hide: [], lock: [:id, :created_at, :updated_at])
-        @roller = roller
+
+      attr_accessor :locals, :role, :model, :includes_models, 
+
+      def crud_express(role: nil, controllers:[], model: nil, collection: nil, includes: {}, hide: [], lock: default_lock)
+        if role.to_sym == :admin || !controllers.blank?
+          @role = :admin
+          @controllers = controllers
+        elsif role.to_sym == :model || !model.blank?
+          @role = :model
+          @model = model
+          @collection = collection
+          @includes = includes
+          @hidden_columns = Set.new(hide)
+          @locked_columns = Set.new(lock)
+        else
+        end
+      end
+
+      def default_lock
+        [:id, :created_at, :updated_at]
+      end
+
+      def crud_express_role(role = :model, model: nil, includes: {}, hide: [], lock: [:id, :created_at, :updated_at])
+        @role = role
         self.include InstanceMethods
-        case roller
+        case role
         when :admin
           self.extend AdminClassMethods
           self.include AdminInstanceMethods
@@ -120,8 +153,6 @@ module CrudExpress::Helpers
       def column_types
         @column_types ||= @model.columns.each_with_object(ActiveSupport::HashWithIndifferentAccess.new){|column, hsh| hsh[column.name] = column.type}
       end
-
-
     end
 
     module InstanceMethods
@@ -129,15 +160,15 @@ module CrudExpress::Helpers
 
       def prepare_crud_express
         @locals = locals
-        @locals[:collection] = collection if self.class.roller == :model
+        @locals[:collection] = collection if self.class.role == :model
         @model = self.class.model
         @helper = self.class
         @includes_models = self.class.includes_models
       end
 
       def index
-        locals[:collection] = collection if self.class.roller == :model
-        locals[:crud_express] = crud_express if self.class.roller == :index
+        locals[:collection] = collection if self.class.role == :model
+        locals[:crud_express] = crud_express if self.class.role == :index
       end
 
       def new
@@ -178,7 +209,7 @@ module CrudExpress::Helpers
         unless performed?
         respond_to do |format|
           format.html {}
-          format.js {render partial: "shared/crud_express/#{self.class.roller}/#{action}", locals: locals}
+          format.js {render partial: "shared/crud_express/#{self.class.role}/#{action}", locals: locals}
         end
         end
       end

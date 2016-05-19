@@ -1,10 +1,10 @@
 module CrudExpress
 end
-
-begin
-  require 'rails'
-rescue LoadError
-end
+# 
+# begin
+#   require 'rails'
+# rescue LoadError
+# end
 
 
 

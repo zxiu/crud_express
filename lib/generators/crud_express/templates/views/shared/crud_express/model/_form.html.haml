@@ -1,7 +1,8 @@
+= @entry.class.column_names
 - column_types = @entry.class.columns.each_with_object(HashWithIndifferentAccess.new){|column, hsh| hsh[column.name] = column.type}
 = simple_form_for @entry, url: url_for(controller: params[:controller], action: @entry.id.blank? ? :create : :update), remote: true do |f|
   - @entry.class.column_names.each do |column_name|
-    - unless @helper.hidden?(column_name) || @helper.readonly?(column_name)
+    - unless @helper.hidden?(column_name) || @helper.readonly?(column_name) || @helper.includes_models.has_key?(column_name)
       - as = case column_types[column_name]
         - when :date
           - :date_picker
