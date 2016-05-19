@@ -10,14 +10,15 @@ module CrudExpress::Helpers
     end
 
     module AdminClassMethods
-      def add_model(model, controller:)
-        models[model.name] = Hash.new
-        models[model.name][:controller] = controller
-      end
 
-      def models
-        locals[:models] = @models ||= HashWithIndifferentAccess.new
-      end
+      # def add_model(model, controller:)
+      #   models[model.name] = Hash.new
+      #   models[model.name][:controller] = controller
+      # end
+      #
+      # def models
+      #   locals[:models] = @models ||= HashWithIndifferentAccess.new
+      # end
 
       def controllers
         @controllers ||= []
@@ -27,9 +28,10 @@ module CrudExpress::Helpers
     module AdminInstanceMethods
       attr_accessor :models
 
-      def models
-        self.class.models
+      def prepare_crud_express
+        @controllers = self.class.controllers
       end
+
     end
 
     module ModelClassMethods
@@ -44,16 +46,26 @@ module CrudExpress::Helpers
       def collection
         @collection = self.try(self.class.collection_func)
       end
+
+      def prepare_crud_express
+        @locals = locals
+        @locals[:collection] = collection if self.class.role == :model
+        @model = self.class.model
+        @helper = self.class
+        @includes_models = self.class.includes_models
+      end
     end
 
     module ClassMethods
 
-      attr_accessor :locals, :role, :model, :includes_models, 
+      attr_accessor :locals, :role, :model, :includes_models
 
-      def crud_express(role: nil, controllers:[], model: nil, collection: nil, includes: {}, hide: [], lock: default_lock)
+      def crud_express(role: nil, controllers: [], model: nil, collection: nil, includes: {}, hide: [], lock: default_lock)
         if role.to_sym == :admin || !controllers.blank?
           @role = :admin
           @controllers = controllers
+          self.extend AdminClassMethods
+          self.include AdminInstanceMethods
         elsif role.to_sym == :model || !model.blank?
           @role = :model
           @model = model
@@ -61,7 +73,8 @@ module CrudExpress::Helpers
           @includes = includes
           @hidden_columns = Set.new(hide)
           @locked_columns = Set.new(lock)
-        else
+          self.extend ModelClassMethods
+          self.include ModelInstanceMethods
         end
       end
 
@@ -158,13 +171,7 @@ module CrudExpress::Helpers
     module InstanceMethods
       attr_accessor :locals
 
-      def prepare_crud_express
-        @locals = locals
-        @locals[:collection] = collection if self.class.role == :model
-        @model = self.class.model
-        @helper = self.class
-        @includes_models = self.class.includes_models
-      end
+
 
       def index
         locals[:collection] = collection if self.class.role == :model
@@ -221,11 +228,6 @@ module CrudExpress::Helpers
       def locals
         self.class.locals
       end
-
-      def crud_express
-        self.class.crud_express
-      end
-
     end
 
   end
