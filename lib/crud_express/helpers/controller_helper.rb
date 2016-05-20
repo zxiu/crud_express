@@ -11,11 +11,6 @@ module CrudExpress::Helpers
     end
 
     module AdminInstanceMethods
-      attr_accessor :models
-
-      def prepare_crud_express
-        @controllers = self.class.controllers
-      end
 
     end
 
@@ -31,22 +26,13 @@ module CrudExpress::Helpers
       def collection
         @collection = self.try(self.class.collection_func)
       end
-
-      def prepare_crud_express
-        @locals = locals
-        @locals[:collection] = collection if self.class.role == :model
-        @model = self.class.model
-        @helper = self.class
-        @includes_models = self.class.includes_models
-      end
     end
 
     module ClassMethods
-
-      @crud_expressed = false
       attr_accessor :locals, :role, :model, :includes_models, :controllers
+      @default_lock = [:id, :created_at, :updated_at]
 
-      def crud_express(role: nil, controllers: [], model: nil, collection: nil, includes: {}, hide: [], lock: default_lock)
+      def crud_express(role: nil, controllers: [], model: nil, collection: nil, includes: {}, hide: [], lock: @default_lock)
         self.include InstanceMethods
         if role.to_sym == :admin || !controllers.blank?
           @role = :admin
@@ -63,14 +49,8 @@ module CrudExpress::Helpers
           self.extend ModelClassMethods
           self.include ModelInstanceMethods
         end
-
       end
 
-
-
-      def default_lock
-        [:id, :created_at, :updated_at]
-      end
 
       def crud_express_role(role = :model, model: nil, includes: {}, hide: [], lock: [:id, :created_at, :updated_at])
         @role = role
@@ -159,8 +139,25 @@ module CrudExpress::Helpers
     end
 
     def prepare_crud_express
+      if is_admin?
+        @controllers = self.class.controllers
+      elsif is_model?
+        @locals = locals
+        @locals[:collection] = collection
+        @collection = collection
+        @model = self.class.model
+        @helper = self.class
+        @includes_models = self.class.includes_models
+      end
     end
 
+    def is_model?
+      self.class.role == :model
+    end
+
+    def is_admin?
+      self.class.role == :admin
+    end
 
     module InstanceMethods
       attr_accessor :locals
