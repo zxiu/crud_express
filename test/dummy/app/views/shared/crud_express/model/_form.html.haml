@@ -13,7 +13,7 @@
       - if @entry.class.defined_enums.has_key?(column_name)
         = f.input column_name,
             collection: @entry.class.defined_enums[column_name],
-            selected: @entry.class.defined_enums[column_name][@entry.send(column_name)],
+            selected: @entry.send(column_name),
             include_blank: false
       - elsif !@entry.class.readonly_attributes.include?(column_name)
         = f.input column_name, as: as
