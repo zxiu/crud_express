@@ -1,2 +1,2 @@
 $('#modal').modal('hide');
-$('tbody.<%= entry.model_name%>').append("<%= j (render partial: 'shared/crud_express/model/entry', object: @entry) %>")
+$('tbody.<%= @entry.model_name%>').append("<%= j (render partial: 'shared/crud_express/model/entry', locals: {entry: @entry}) %>")
