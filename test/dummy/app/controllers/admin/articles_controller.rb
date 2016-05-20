@@ -7,4 +7,7 @@ class Admin::ArticlesController < ModelController
     Article.includes(:tags).all
   end
 
+  def index
+  end
+
 end

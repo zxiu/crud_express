@@ -2,27 +2,12 @@ module CrudExpress::Helpers
   module ControllerHelper
     extend ActiveSupport::Concern
 
+
     included do
-      # before_action :set_object, only: [:show]
-      puts(" included #{self}")
       before_action :prepare_crud_express
-      # around_action :respond_crud_express
     end
 
     module AdminClassMethods
-
-      # def add_model(model, controller:)
-      #   models[model.name] = Hash.new
-      #   models[model.name][:controller] = controller
-      # end
-      #
-      # def models
-      #   locals[:models] = @models ||= HashWithIndifferentAccess.new
-      # end
-
-      def controllers
-        @controllers ||= []
-      end
     end
 
     module AdminInstanceMethods
@@ -58,9 +43,11 @@ module CrudExpress::Helpers
 
     module ClassMethods
 
-      attr_accessor :locals, :role, :model, :includes_models
+      @crud_expressed = false
+      attr_accessor :locals, :role, :model, :includes_models, :controllers
 
       def crud_express(role: nil, controllers: [], model: nil, collection: nil, includes: {}, hide: [], lock: default_lock)
+        self.include InstanceMethods
         if role.to_sym == :admin || !controllers.blank?
           @role = :admin
           @controllers = controllers
@@ -76,7 +63,10 @@ module CrudExpress::Helpers
           self.extend ModelClassMethods
           self.include ModelInstanceMethods
         end
+
       end
+
+
 
       def default_lock
         [:id, :created_at, :updated_at]
@@ -167,6 +157,10 @@ module CrudExpress::Helpers
         @column_types ||= @model.columns.each_with_object(ActiveSupport::HashWithIndifferentAccess.new){|column, hsh| hsh[column.name] = column.type}
       end
     end
+
+    def prepare_crud_express
+    end
+
 
     module InstanceMethods
       attr_accessor :locals
