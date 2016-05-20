@@ -1,2 +1,2 @@
 $('#modal').modal('hide');
-$("tr#<%= entry.model_name %>_<%= entry.id %>").replaceWith("<%= j (render partial: 'shared/crud_express/model/entry', object: @entry) %>")
+$("tr#<%= @entry.model_name %>_<%= @entry.id %>").replaceWith("<%= j (render partial: 'shared/crud_express/model/entry', object: @entry) %>")
