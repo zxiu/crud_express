@@ -12,12 +12,11 @@ Tag.create(name: "banana")
 
 tags = Tag.all.to_a
 
-(1..10).each do |i|
-  User.create(first_name: 'Z', last_name: 'Xiu', gender: 'male', email: 'zxiu@zxiu.com', birthday: Date.today)
+(1..100).each do |i|
+  User.create(first_name: "##{i}", last_name: "Dummy#{i}", gender: 'male', email: "dummy#{i}@dummy.com", birthday: Date.today)
 end
-(1..10).each do |i|
-
-  article = Article.create(title: 'haha', content: 'What a gem')
+(1..100).each do |i|
+  article = Article.create(title: 'This is a title', content: 'This is a content')
   article.tags = tags
   article.save
 end
