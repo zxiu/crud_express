@@ -4,7 +4,6 @@ module CrudExpress::Helpers
 
     included do
       before_action :prepare_crud_express
-      before_action :respond_crud_express
     end
 
     module AdminClassMethods
@@ -119,8 +118,6 @@ module CrudExpress::Helpers
 
     module ClassMethods
       attr_accessor :role
-
-
       def crud_express (role: nil, controllers: [], model: nil, collection: nil, includes: {}, hide: [], lock: @default_lock)
         if role.to_sym == :admin || !controllers.blank?
           @role = :admin
@@ -134,8 +131,6 @@ module CrudExpress::Helpers
           crud_express_model(model: model, collection: collection, includes: includes, hide: hide, lock: lock)
         end
       end
-
-
     end
 
     def is_model?
@@ -155,11 +150,9 @@ module CrudExpress::Helpers
         @helper = self.class
         @includes_models = self.class.includes_models
       end
-    end
 
-    def respond_crud_express
-      action = params[:action]
       if is_model? || is_admin?
+        action = params[:action]
         self.try(action)
         respond_to do |format|
           format.html {}
@@ -167,5 +160,6 @@ module CrudExpress::Helpers
         end
       end
     end
+
   end
 end
