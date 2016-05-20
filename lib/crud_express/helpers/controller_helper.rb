@@ -120,10 +120,6 @@ module CrudExpress::Helpers
         readonly_columns.include?(column_name.to_sym)
       end
 
-      def hello
-        "hello"
-      end
-
       private
       def hidden_columns
         @hidden_columns ||= Set.new
