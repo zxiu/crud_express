@@ -1,2 +1,3 @@
 $('.modal-body').html("<%= j (render partial: 'shared/crud_express/model/form.html', object: @entry) %>");
+$('.modal-title').html("New <%= @entry.class.model_name %>")
 $('#modal').modal('show');

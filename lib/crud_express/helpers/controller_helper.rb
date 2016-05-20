@@ -19,10 +19,8 @@ module CrudExpress::Helpers
     module ModelClassMethods
       attr_accessor :model, :collection, :includes_models
       @hidden_columns = Set.new
-      @default_lock = [:id, :created_at, :updated_at]
-      @locked_columns = Set.new(@default_lock)
 
-      def crud_express_model(model: nil, collection: nil, includes: {}, hide: [], lock: @default_lock)
+      def crud_express_model(model: nil, collection: nil, includes: {}, hide: [], lock:)
         @model = model
         @collection = collection
         @includes = includes
@@ -46,7 +44,7 @@ module CrudExpress::Helpers
               includes_models_columns.push("#{association_foreign_key}")
           end
         end
-        return (Set.new(@model.column_names) - @hidden_columns).to_a.concat(includes_models_columns)
+        return (Set.new(@model.column_names) - @hidden_columns - @locked_columns).to_a.concat(includes_models_columns)
       end
 
       def visible?(column_name)
@@ -63,6 +61,11 @@ module CrudExpress::Helpers
 
       def locked?(column_name)
         @locked_columns.include?(column_name.to_sym)
+      end
+
+      def permit?(column_name)
+        puts("permit = #{@locked_columns.inspect} ... #{@hidden_columns.inspect}")
+        return !hidden?(column_name) && !locked?(column_name)
       end
 
       private
@@ -118,7 +121,8 @@ module CrudExpress::Helpers
 
     module ClassMethods
       attr_accessor :role
-      def crud_express (role: nil, controllers: [], model: nil, collection: nil, includes: {}, hide: [], lock: @default_lock)
+      
+      def crud_express (role: nil, controllers: [], model: nil, collection: nil, includes: {}, hide: [], lock: [:id, :created_at, :updated_at] )
         if role.to_sym == :admin || !controllers.blank?
           @role = :admin
           self.extend AdminClassMethods
