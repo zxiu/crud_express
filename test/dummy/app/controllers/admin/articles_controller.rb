@@ -1,13 +1,9 @@
 class Admin::ArticlesController < ModelController
-  crud_express_role model: Article, includes: {user: {label: :first_name}, :tags => {label: :name}}
-  crud_express_collection :article_list
-  # before_action :prepare_crud_express
+  crud_express role: :model, model: Article, collection: :list, includes: {user: {label: :first_name}, :tags => {label: :name}}
   around_action :respond_crud_express
-  def article_list
-    Article.includes(:tags).all
-  end
 
-  def index
+  def list
+    Article.includes(:tags).all
   end
 
 end

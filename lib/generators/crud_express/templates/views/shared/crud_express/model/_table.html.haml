@@ -1,7 +1,16 @@
+-# =  ::Admin::UsersController.model
+-# =  ::Admin::UsersController.controller_path
+-# =  ::Admin::UsersController.action_methods.inspect
+-# - Rails.application.routes.routes.each_with_index do |route, index|
+-#   %p
+-#     = route.constraints if index == 14
+-#   %p
+-#     = route.inspect if index == 14
+
 %table.table
   %thead
     %tr
-      - collection.column_names.each do |column_name|
+      - @collection.column_names.each do |column_name|
         - unless @helper.hidden?(column_name)
           %td
             = column_name
@@ -13,8 +22,8 @@
           .btn.btn-sm.btn-success
             %span.glyphicon.glyphicon-refresh
 
-  %tbody{class: collection.model_name}
-    - collection.each do |entry|
+  %tbody{class: @collection.model_name}
+    - @collection.each do |entry|
       = render partial: 'shared/crud_express/model/entry', object: entry
 
 :css

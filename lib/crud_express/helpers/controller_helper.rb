@@ -5,31 +5,24 @@ module CrudExpress::Helpers
 
     included do
       before_action :prepare_crud_express
+      # around_action :respond_crud_express
     end
 
     module AdminClassMethods
     end
-
     module AdminInstanceMethods
-
     end
 
     module ModelClassMethods
-      attr_accessor :collection_func
-
-      def crud_express_collection(func)
-        @collection_func = func
-      end
     end
-
     module ModelInstanceMethods
       def collection
-        @collection = self.try(self.class.collection_func)
+        @collection = self.try(self.class.collection)
       end
     end
 
     module ClassMethods
-      attr_accessor :locals, :role, :model, :includes_models, :controllers
+      attr_accessor :locals, :role, :model, :includes_models, :controllers, :collection
       @default_lock = [:id, :created_at, :updated_at]
 
       def crud_express(role: nil, controllers: [], model: nil, collection: nil, includes: {}, hide: [], lock: @default_lock)
@@ -46,26 +39,9 @@ module CrudExpress::Helpers
           @includes = includes
           @hidden_columns = Set.new(hide)
           @locked_columns = Set.new(lock)
-          self.extend ModelClassMethods
-          self.include ModelInstanceMethods
-        end
-      end
-
-
-      def crud_express_role(role = :model, model: nil, includes: {}, hide: [], lock: [:id, :created_at, :updated_at])
-        @role = role
-        self.include InstanceMethods
-        case role
-        when :admin
-          self.extend AdminClassMethods
-          self.include AdminInstanceMethods
-        when :model
-          self.extend ModelClassMethods
-          self.include ModelInstanceMethods
-          @model = model
-          hide_columns(*hide)
-          lock_columns(*lock)
           @includes_models = includes_models.merge(includes)
+          self.extend ModelClassMethods
+          self.include ModelInstanceMethods
         end
       end
 
@@ -139,7 +115,6 @@ module CrudExpress::Helpers
         @controllers = self.class.controllers
       elsif is_model?
         @locals = locals
-        @locals[:collection] = collection
         @collection = collection
         @model = self.class.model
         @helper = self.class
@@ -158,16 +133,31 @@ module CrudExpress::Helpers
     module InstanceMethods
       attr_accessor :locals
 
-
+      def respond_crud_express
+        puts("respond_crud_express")
+        action = params[:action]
+        if is_model?
+          @entry = self.class.model.find_by(id: params[:id])
+          self.try(action)
+          unless performed?
+            respond_to do |format|
+              format.html {}
+              format.js {render partial: "shared/crud_express/#{self.class.role}/#{action}", locals: locals}
+            end
+          end
+        elsif is_admin?
+          self.try(action)
+        end
+      end
 
       def index
-        locals[:collection] = collection if self.class.role == :model
-        locals[:crud_express] = crud_express if self.class.role == :index
+      end
+
+      def show
       end
 
       def new
         @entry = self.class.model.find_or_initialize_by(id: params[:id])
-        locals[:entry] = @entry
       end
 
       def permit_params
@@ -181,7 +171,8 @@ module CrudExpress::Helpers
       end
 
       def edit
-        locals[:entry] = User.find_by(id: params[:id])
+        @entry = self.class.model.find_by(id: params[:id])
+        # locals[:entry] = User.find_by(id: params[:id])
       end
 
       def update
@@ -195,22 +186,6 @@ module CrudExpress::Helpers
         @entry.destroy
         locals[:entry] = @entry
       end
-
-      def respond_crud_express
-        @entry = self.class.model.find_by(id: params[:id])
-        action = params[:action]
-        self.send(action)
-        unless performed?
-        respond_to do |format|
-          format.html {}
-          format.js {render partial: "shared/crud_express/#{self.class.role}/#{action}", locals: locals}
-        end
-        end
-      end
-
-      def show
-      end
-
 
       def locals
         self.class.locals
