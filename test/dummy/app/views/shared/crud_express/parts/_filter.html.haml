@@ -1,22 +1,37 @@
 %p
   - SimpleForm.browser_validations = false
-  - if @helper.filters.length > 0
-    -# = form_tag url_for(controller: params[:controller], action: params[:action]), method: :get, remote: true do
-    -#   - @helper.filters.each do |filter|
-    -#     - if filter.is_a?(Array)
-    -#       = text_field_tag filter, params[filter.join(' ')], placeholder: filter.join(' or ').gsub('_', ' ')
-    -#     - elsif filter.is_a?(Symbol)
-    -#       = text_field_tag filter, params[filter], placeholder: filter
-    -#   = submit_tag :filter
+  - unless @helper.filters.blank?
     = simple_form_for @helper.model_params_key, wrapper: :small, url: url_for(controller: params[:controller], action: params[:action]), method: :get, remote: true, :html => { :class => 'form-inline' } do |f|
       - filter_params = params[@helper.model_params_key]
       - @helper.filters.each do |filter|
         - if filter.is_a?(Array)
           - name = filter.join(' ')
+          - value = filter_params[name] unless filter_params.blank?
           - placeholder = filter.join(' or ').gsub('_', ' ')
+          - as = :string
+          = f.input name, as: as, input_html: {value: value}, placeholder: placeholder, required: false
         - elsif filter.is_a?(Symbol) || filter.is_a?(String)
           - name = filter
+          - value = filter_params[name] unless filter_params.blank?
           - placeholder = filter.to_s
-        - value = filter_params[name] unless filter_params.blank?
-        = f.input name, input_html: {value: value}, placeholder: placeholder, required: false
+          - as = case @helper.column_types[filter]
+          - when :date
+            - :date_picker
+          - when :time
+            - :time_picker
+          - when :datetime, :timestamp
+            - :datetime_picker
+          - else
+            - :string
+          - case @helper.column_types[filter]
+          - when :date, :time, :datetime, :timestamp
+            = f.input "#{name}[from]", as: as, input_html: {value: value}, placeholder: "#{placeholder} from", required: false
+            = f.input "#{name}[to]", as: as, input_html: {value: value}, placeholder: "#{placeholder} to", required: false
+          - else
+            = f.input name, as: as, input_html: {value: value}, placeholder: placeholder, required: false
       = f.submit :filter, :class => "btn btn-default"
+
+:javascript
+  $('input.datetime_picker').datetimepicker();
+  $('input.date_picker').datetimepicker();
+  $('input.time_picker').datetimepicker();

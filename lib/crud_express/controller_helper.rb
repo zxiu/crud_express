@@ -97,7 +97,14 @@ module CrudExpress
               s2 = filter.map {|f| "%#{filter_params[filter.join(" ")]}%"}
               @collection = @collection.where(s1, *s2) unless filter_params[filter.join(" ")].blank?
             elsif filter.is_a?(Symbol) || filter.is_a?(String)
-              @collection = @collection.where("#{filter} like ?", "%#{filter_params[filter]}%") unless filter_params[filter].blank?
+              case self.class.column_types[filter]
+              when :string, :text
+                @collection = @collection.where("#{filter} like ?", "%#{filter_params[filter]}%") unless filter_params[filter].blank?
+              when :date, :time, :datetime, :timestamp
+                from = filter_params["#{filter}_from"]
+                to = filter_params["#{filter}_to"]
+                puts("from=#{from} to=#{to}")
+              end
             end
           end
         end
