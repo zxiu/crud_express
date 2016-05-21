@@ -1,7 +1,8 @@
+= render partial: 'shared/crud_express/parts/filter'
 %table.table
   %thead
     %tr
-      - collection.column_names.each do |column_name|
+      - @collection.column_names.each do |column_name|
         - unless @helper.hidden?(column_name)
           %td
             = column_name
@@ -9,13 +10,15 @@
         = link_to controller: params[:controller], action: :new, method: :get, remote: true do
           .btn.btn-sm.btn-warning
             %span.glyphicon.glyphicon-plus
-        = link_to controller: params[:controller], action: :index, method: :get, remote: true do
+        = link_to url_for(params.merge(page: params[:page])), method: :get, remote: true, class: ["btn-refresh"] do
           .btn.btn-sm.btn-success
             %span.glyphicon.glyphicon-refresh
 
-  %tbody{class: collection.model_name}
-    - collection.each do |entry|
+  %tbody{class: @collection.model_name}
+    - @collection.each do |entry|
       = render partial: 'shared/crud_express/model/entry', object: entry
+
+= paginate @collection, :remote => true
 
 :css
   td {

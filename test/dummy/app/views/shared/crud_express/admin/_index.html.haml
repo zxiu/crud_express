@@ -1,16 +1,16 @@
 %ul.nav.nav-tabs
-  - models.each_with_index do |(model_name, v), i|
+  - @controllers.each_with_index do |controller, i|
     %li
-      %a{"data-toggle" => "tab", :href => "#tab-#{model_name}"}
-        = model_name
+      %a{"data-toggle" => "tab", :href => "#tab-#{controller.model}"}
+        = controller.model
 
 .tab-content
-  - models.each_with_index do |(model_name, value), i|
-    .tab-pane.fade{:id => "tab-#{model_name}"}
+  - @controllers.each_with_index do |controller, i|
+    .tab-pane.fade{:id => "tab-#{controller.model}"}
       .hide
-        = button_to "refresh", {controller: value[:controller], action: :index},
-                  method: :get, remote: true, class: ["btn", "btn-success", "btn-refresh", "hide"]
-      #table-container{controller: value[:controller]}
+        = button_to "refresh", {controller: controller.controller_path, action: :index},
+                  method: :get, remote: true, class: ["btn", "btn-success", "btn-refresh-hide"]
+      #table-container{controller: controller.controller_path}
 
 .modal.fade{:id => "modal", "aria-labelledby" => "model-title", :role => "dialog", :tabindex => "-1"}
   .modal-dialog{:role => "document"}
@@ -25,7 +25,7 @@
   $(function() {
     $('a[data-toggle="tab"]').on('show.bs.tab', function (e) {
       var tabId = $(e.target).attr('href');
-      $(tabId).find(".btn-refresh").first().click();
+      $(tabId).find(".btn-refresh-hide").first().click();
     }).each(function(i){
       if (i == 0){
         $(this).tab('show')

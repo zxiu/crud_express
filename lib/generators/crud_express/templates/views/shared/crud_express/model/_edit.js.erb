@@ -1,2 +1,3 @@
-$('.modal-body').html("<%= j (render partial: 'shared/crud_express/model/form.html', object: @entry) %>");
+$('.modal-body').html("<%= j (render partial: 'shared/crud_express/model/form.html', locals: {entry: @entry}) %>");
+$('.modal-title').html("Edit <%= @entry.class.model_name %> #<%= @entry.id %> ")
 $('#modal').modal('show');

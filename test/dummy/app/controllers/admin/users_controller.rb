@@ -1,12 +1,8 @@
 class Admin::UsersController < ModelController
-  crud_express_roller model: User, includes: {:articles => {:label => :title}}, hide: [:created_at], lock: [:id]
-  crud_express_collection :user_list
-  before_action :prepare_crud_express
-  around_action :respond_crud_express
+  crud_express role: :model, model: User, collection: :list, includes: {:articles => {:label => :title}}, hide: [:created_at],
+  filters: [[:first_name, :last_name], :email]
 
-  def user_list
-    User.includes(:articles).all
-    # User.all
+  def list
+    User.all.page(params[:page])
   end
-
 end

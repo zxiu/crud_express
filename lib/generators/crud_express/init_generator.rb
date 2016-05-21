@@ -1,4 +1,4 @@
-module crud_express
+module Crud_express
   module Generators
     class InitGenerator < Rails::Generators::Base
       desc "Copy templates view file"
