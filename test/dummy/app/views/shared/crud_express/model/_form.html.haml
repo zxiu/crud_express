@@ -1,3 +1,4 @@
+- SimpleForm.browser_validations = true
 - column_types = @entry.class.columns.each_with_object(HashWithIndifferentAccess.new){|column, hsh| hsh[column.name] = column.type}
 = simple_form_for @entry, url: url_for(controller: params[:controller], action: @entry.id.blank? ? :create : :update), remote: true do |f|
   - @entry.class.column_names.each do |column_name|

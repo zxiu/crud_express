@@ -1,2 +1,22 @@
-= form_tag url_for(params), method: :get, remote: true do
-  = button_tag
+%p
+  - SimpleForm.browser_validations = false
+  - if @helper.filters.length > 0
+    -# = form_tag url_for(controller: params[:controller], action: params[:action]), method: :get, remote: true do
+    -#   - @helper.filters.each do |filter|
+    -#     - if filter.is_a?(Array)
+    -#       = text_field_tag filter, params[filter.join(' ')], placeholder: filter.join(' or ').gsub('_', ' ')
+    -#     - elsif filter.is_a?(Symbol)
+    -#       = text_field_tag filter, params[filter], placeholder: filter
+    -#   = submit_tag :filter
+    = simple_form_for @helper.model_params_key, wrapper: :small, url: url_for(controller: params[:controller], action: params[:action]), method: :get, remote: true, :html => { :class => 'form-inline' } do |f|
+      - filter_params = params[@helper.model_params_key]
+      - @helper.filters.each do |filter|
+        - if filter.is_a?(Array)
+          - name = filter.join(' ')
+          - placeholder = filter.join(' or ').gsub('_', ' ')
+        - elsif filter.is_a?(Symbol) || filter.is_a?(String)
+          - name = filter
+          - placeholder = filter.to_s
+        - value = filter_params[name] unless filter_params.blank?
+        = f.input name, input_html: {value: value}, placeholder: placeholder, required: false
+      = f.submit :filter, :class => "btn btn-default"

@@ -1,4 +1,4 @@
-module CrudExpress::Helpers
+module CrudExpress
   module ControllerHelper
     extend ActiveSupport::Concern
 
@@ -17,20 +17,25 @@ module CrudExpress::Helpers
     end
 
     module ModelClassMethods
-      attr_accessor :model, :collection, :includes_models
+      attr_accessor :model, :collection, :includes_models, :filters
       @hidden_columns = Set.new
 
-      def crud_express_model(model: nil, collection: nil, includes: {}, hide: [], lock:)
+      def crud_express_model(model: nil, collection: nil, includes: {}, hide: [], lock:, filters: [])
         @model = model
         @collection = collection
         @includes = includes
         @hidden_columns = Set.new(hide)
         @locked_columns = Set.new(lock)
         @includes_models = includes_models.merge(includes)
+        @filters = filters
       end
 
       def includes_models
         @includes_models ||= Hash.new
+      end
+
+      def model_params_key
+        ActiveModel::Naming.param_key(model)
       end
 
       def permit_columns
@@ -68,7 +73,6 @@ module CrudExpress::Helpers
         return !hidden?(column_name) && !locked?(column_name)
       end
 
-      private
       def column_types
         @column_types ||= @model.columns.each_with_object(ActiveSupport::HashWithIndifferentAccess.new){|column, hsh| hsh[column.name] = column.type}
       end
@@ -77,17 +81,30 @@ module CrudExpress::Helpers
 
     module ModelInstanceMethods
       def collection
-        @collection = self.try(self.class.collection)
-      end
-
-      def index
-      end
-
-      def show
+        self.try(self.class.collection)
       end
 
       def model
         collection.model
+      end
+
+      def index
+        @collection = collection
+        if params.has_key?(self.class.model_params_key)
+          self.class.filters.each do |filter|
+            if filter.is_a?(Array)
+              s1 = (filter.map {|f| "#{f} like ?"}).join(" or ")
+              s2 = filter.map {|f| "%#{filter_params[filter.join(" ")]}%"}
+              @collection = @collection.where(s1, *s2) unless filter_params[filter.join(" ")].blank?
+            elsif filter.is_a?(Symbol) || filter.is_a?(String)
+              @collection = @collection.where("#{filter} like ?", "%#{filter_params[filter]}%") unless filter_params[filter].blank?
+            end
+          end
+        end
+      end
+
+      def show
+        @entry = model.find_or_initialize_by(id: params[:id])
       end
 
       def new
@@ -95,7 +112,16 @@ module CrudExpress::Helpers
       end
 
       def permit_params
-        params.require(ActiveModel::Naming.param_key(self.class.model)).permit(*self.class.permit_columns)
+        require_params.permit(*self.class.permit_columns)
+      end
+
+      def filter_params
+        p = self.class.filters.map {|f| f.is_a?(Array) ? f.join(" ") : f }
+        require_params.permit(*p)
+      end
+
+      def require_params
+        params.require(self.class.model_params_key)
       end
 
       def create
@@ -121,8 +147,8 @@ module CrudExpress::Helpers
 
     module ClassMethods
       attr_accessor :role
-      
-      def crud_express (role: nil, controllers: [], model: nil, collection: nil, includes: {}, hide: [], lock: [:id, :created_at, :updated_at] )
+
+      def crud_express (role: nil, controllers: [], model: nil, collection: nil, includes: {}, hide: [], lock: [:id, :created_at, :updated_at], filters: [] )
         if role.to_sym == :admin || !controllers.blank?
           @role = :admin
           self.extend AdminClassMethods
@@ -132,7 +158,7 @@ module CrudExpress::Helpers
           @role = :model
           self.extend ModelClassMethods
           self.include ModelInstanceMethods
-          crud_express_model(model: model, collection: collection, includes: includes, hide: hide, lock: lock)
+          crud_express_model(model: model, collection: collection, includes: includes, hide: hide, lock: lock, filters: filters)
         end
       end
     end
@@ -149,7 +175,6 @@ module CrudExpress::Helpers
       if is_admin?
         @controllers = self.class.controllers
       elsif is_model?
-        @collection = collection
         @model = self.class.model
         @helper = self.class
         @includes_models = self.class.includes_models
